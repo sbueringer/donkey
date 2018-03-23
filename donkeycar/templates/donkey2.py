@@ -22,8 +22,8 @@ from donkeycar.parts.transform import Lambda
 from donkeycar.parts.keras import KerasCategorical
 from donkeycar.parts.actuator import PCA9685, PWMSteering, PWMThrottle
 from donkeycar.parts.datastore import TubHandler, TubGroup
-from donkeycar.parts.controller import LocalWebController, JoystickController, RCController
-
+from donkeycar.parts.controller import LocalWebController, JoystickController
+from donkeycar.parts.web_controller.rc import RCController
 
 
 def drive(cfg, model_path=None, use_joystick=False):

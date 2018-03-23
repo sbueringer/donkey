@@ -15,7 +15,7 @@ class RCController():
         self.throttle = 0.0
         self.mode = 'user'
         self.recording = True
-        self.connection = serial.Serial('/dev/ttyACM0', 9600)  # todo: put this to config
+        self.connection = serial.Serial('/dev/ttyACM0', 115200)  # todo: put this to config
         time.sleep(5)  # Arduino is resetting
         print('Established connection to Arduino')
 
