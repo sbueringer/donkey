@@ -1,0 +1,46 @@
+
+DONKEY_HOME=~/code/github.com/sbueringer/donkeycar
+DONKEY=/home/pi/.virtualenvs/dk/bin/donkey
+SSH_CMD="sshpass -p 'asdfasdf' ssh pi@donkeybeer"
+SSHPASS_CMD="sshpass -p 'asdfasdf'"
+
+# Donkeycar from local: ssh, compile & createcar
+alias donkeyssh="$SSH_CMD"
+alias donkeyrecompile="$SSHPASS_CMD scp -rp $DONKEY_HOME/donkeycar pi@donkeybeer:~/donkeycar/; $SSH_CMD pip install -e /home/pi/donkeycar"
+alias donkeycreate="$SSH_CMD $DONKEY createcar --overwrite"
+
+# Donkeycar: drive with/without rc with/without AI
+alias donkeydrive="python /home/pi/d2/manage.py drive"
+alias donkeydriverc="python /home/pi/d2/manage.py drive --rc"
+alias donkeydriveai="python /home/pi/d2/manage.py drive --model ~/d2/models/donkeybeer"
+alias donkeydriveairc="python /home/pi/d2/manage.py drive --model ~/d2/models/donkeybeer --rc"
+
+# Local: Simluator, compile, train & tensorboard
+alias donkey_local_activateenv='source $DONKEY_HOME/env/bin/activate'
+donkey_local_recompile()
+{
+  source $DONKEY_HOME/env/bin/activate; pip3.6 install -e $DONKEY_HOME; pip3.6 install pyserial
+  cp $DONKEY_HOME/donkeycar/templates/donkey2.py $DONKEY_HOME/d2/manage.py
+  cp $DONKEY_HOME/donkeycar/templates/config_defaults.py $DONKEY_HOME/d2/config.py
+  mkdir -p $DONKEY_HOME/d2/{models,data,logs}
+}
+donkey_local_convert_tub()
+{
+    source=$1
+    target=$2
+    mkdir -p $target
+
+    for filename in $source/*.jpg; do
+        base_filename=$(basename $filename)
+        convert $source/$base_filename -resize 320x240 $target/$base_filename
+    done
+    cp $source/*.json $target/
+}
+alias donkey_local_train="python3.6 $DONKEY_HOME/d2/manage.py train --tub $DONKEY_HOME'/d2/data_resnet50/*' --model $DONKEY_HOME/d2/models/donkeybeer --resnet50 --tensorboardlog $DONKEY_HOME/d2/logs"
+alias donkey_local_train_categorical="python3.6 $DONKEY_HOME/d2/manage.py train --tub $DONKEY_HOME'/d2/data/*' --model $DONKEY_HOME/d2/models/donkeybeer --tensorboardlog $DONKEY_HOME/d2/logs"
+alias donkey_local_sim="$DONKEY_HOME/DonkeySimLinux/donkey_sim.x86_64"
+alias donkey_local_tensorboard="tensorboard --logdir $DONKEY_HOME/d2/logs"
+
+# Local <=> Donkeycar download data & upload model
+alias donkey_local_dl_data="mkdir -p $DONKEY_HOME/d2; $SSHPASS_CMD scp -rp pi@donkeybeer:~/d2/data $DONKEY_HOME/d2/"
+alias donkey_local_ul_model="$SSHPASS_CMD scp -rp $DONKEY_HOME/d2/models/ pi@donkeybeer:~/d2/"

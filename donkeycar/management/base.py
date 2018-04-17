@@ -91,13 +91,13 @@ class CreateCar(BaseCommand):
         if os.path.exists(car_app_path) and not overwrite:
             print('Car app already exists. Delete it and rerun createcar to replace.')
         else:
-            print("Copying car application template: {}".format(template))
+            print("Copying car application template: {} to {}".format(app_template_path, car_app_path))
             shutil.copyfile(app_template_path, car_app_path)
             
         if os.path.exists(car_config_path) and not overwrite:
             print('Car config already exists. Delete it and rerun createcar to replace.')
         else:
-            print("Copying car config defaults. Adjust these before starting your car.")
+            print("Copying car config defaults: {} to {}".format(config_template_path, car_config_path))
             shutil.copyfile(config_template_path, car_config_path)
  
         print("Donkey setup complete.")

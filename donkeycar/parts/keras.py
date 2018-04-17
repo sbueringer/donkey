@@ -13,17 +13,22 @@ models to help direct the vehicles motion.
 
 
 import os
+from enum import Enum
+
 import numpy as np
 import keras
 
 import donkeycar as dk
 
+PACKAGE_PATH = os.path.dirname(os.path.realpath(__file__))
 
 class KerasPilot():
  
     def load(self, model_path):
         self.model = keras.models.load_model(model_path)
 
+    def activate_tensorboard_log(self, tensorboard_logpath):
+        self.tensorboard_logpath = tensorboard_logpath
     
     def shutdown(self):
         pass
@@ -32,7 +37,13 @@ class KerasPilot():
     def train(self, train_gen, val_gen, 
               saved_model_path, epochs=100, steps=100, train_split=0.8,
               verbose=1, min_delta=.0005, patience=5, use_early_stop=True):
-        
+
+        print("epochs: " + str(epochs))
+        print("steps: " + str(steps))
+        print("train_split: " + str(train_split))
+        print("min_delta: " + str(min_delta))
+        print("patience: " + str(patience))
+
         """
         train_gen: generator that yields an array of images an array of 
         
@@ -51,12 +62,18 @@ class KerasPilot():
                                                    patience=patience, 
                                                    verbose=verbose, 
                                                    mode='auto')
-        
+
+        # write log for tensorboard
+
         callbacks_list = [save_best]
+
+        if self.tensorboard_logpath:
+            callbacks_list.append(keras.callbacks.TensorBoard(log_dir=self.tensorboard_logpath))
 
         if use_early_stop:
             callbacks_list.append(early_stop)
-        
+
+
         hist = self.model.fit_generator(
                         train_gen, 
                         steps_per_epoch=steps, 
@@ -67,14 +84,24 @@ class KerasPilot():
                         validation_steps=steps*(1.0 - train_split))
         return hist
 
+class ModelType(Enum):
+    CATEGORICAL = 1
+    RESNET50 = 2
 
 class KerasCategorical(KerasPilot):
-    def __init__(self, model=None, *args, **kwargs):
+    def __init__(self, cfg=None, model=None, modelType=ModelType.CATEGORICAL, *args, **kwargs):
         super(KerasCategorical, self).__init__(*args, **kwargs)
         if model:
             self.model = model
         else:
-            self.model = default_categorical()
+            if modelType == ModelType.CATEGORICAL:
+                self.model = default_categorical()
+            else:
+                if modelType == ModelType.RESNET50:
+                    self.model = default_resnet50(cfg)
+                else:
+                    raise Exception("Unknown ModelType" + str(modelType))
+
         
     def run(self, img_arr):
         img_arr = img_arr.reshape((1,) + img_arr.shape)
@@ -143,7 +170,29 @@ class KerasIMU(KerasPilot):
         throttle = outputs[1]
         return steering[0][0], throttle[0][0]
 
+def default_resnet50(cfg):
+    from keras.applications import ResNet50
+    from keras.layers import Dense, Input
+    from keras.models import Model
 
+    img_in = Input(shape=(cfg.CAMERA_RESOLUTION[0], cfg.CAMERA_RESOLUTION[1], 3), name='img_in')                      # First layer, input layer, Shape comes from camera.py resolution, RGB
+    x = img_in
+
+    resnet50 = ResNet50(include_top=False, pooling='avg', weights='imagenet')
+    resnet50.trainable = False
+    x = resnet50(x)
+
+    angle_out = Dense(15, activation='softmax', name='angle_out')(x)
+    throttle_out = Dense(1, activation='relu', name='throttle_out')(x)
+
+    model = Model(inputs=[img_in], outputs=[angle_out, throttle_out])
+    model.compile(optimizer='adam',
+                  loss={'angle_out': 'categorical_crossentropy',
+                        'throttle_out': 'mean_absolute_error'},
+                  loss_weights={'angle_out': 0.9, 'throttle_out': .001},
+                  metrics=['accuracy'])
+    model.summary()
+    return model
 
 def default_categorical():
     from keras.layers import Input, Dense, merge
@@ -176,8 +225,9 @@ def default_categorical():
     model.compile(optimizer='adam',
                   loss={'angle_out': 'categorical_crossentropy', 
                         'throttle_out': 'mean_absolute_error'},
-                  loss_weights={'angle_out': 0.9, 'throttle_out': .001})
-
+                  loss_weights={'angle_out': 0.9, 'throttle_out': .001},
+                  metrics=['accuracy'])
+    model.summary()
     return model
 
 
