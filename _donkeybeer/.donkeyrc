@@ -12,6 +12,7 @@ alias donkeycreate="$SSH_CMD $DONKEY createcar --overwrite"
 # Donkeycar: drive with/without rc with/without AI
 alias donkeydrive="python /home/pi/d2/manage.py drive"
 alias donkeydriverc="python /home/pi/d2/manage.py drive --rc"
+alias donkeydrivejs="python /home/pi/d2/manage.py drive --js"
 alias donkeydriveai="python /home/pi/d2/manage.py drive --model ~/d2/models/donkeybeer"
 alias donkeydriveairc="python /home/pi/d2/manage.py drive --model ~/d2/models/donkeybeer --rc"
 

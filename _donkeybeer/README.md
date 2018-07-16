@@ -3,6 +3,9 @@
  (systematisches Fehler analysieren nochmal nachschlagen)
  
 * Rebase from upstream
+* Mobilenetv2
+* Alternativ: Fully connected layer per output
+* anfahren nach und nach (ESC verträgt kein Max Auschlag zu Beginn)
 * Transfer Learning resnet 50 abschließen
     * see slack maybe its possible to change simulator resolution
 * Tensorboard callback mehr metriken anschalten und durchtesten
@@ -41,8 +44,8 @@ donkeyssh
 # Update, compile & start donkeycar on donkeycar
 
 ````
-donkeycompile && donkeyupdate && donkeystart
-# UI: http://192.168.43.164:8887/drive
+donkeycompile && donkeystart
+# UI: http://donkeybeer:8887/drive
 ````
 
 # Install donkeycar on Fedora
