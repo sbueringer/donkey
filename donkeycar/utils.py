@@ -189,12 +189,12 @@ def map_range(x, X_min, X_max, Y_min, Y_max):
     y = ((x-X_min) / XY_ratio + Y_min) // 1
 
     print('x ' + str(x))
+    print('y ' + str(y))
     print('X_range ' + str(X_range))
     print('Y_range ' + str(Y_range))
     print('XY_ratio ' + str(XY_ratio))
     print('Y_min ' + str(Y_min))
     print('Y_max ' + str(Y_max))
-    print('y ' + str(y))
 
     return int(y)
 

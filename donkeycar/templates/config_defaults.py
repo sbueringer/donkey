@@ -17,7 +17,7 @@ import os
 
 #PATHS
 CAR_PATH = PACKAGE_PATH = os.path.dirname(os.path.realpath(__file__))
-DATA_PATH = os.path.join(CAR_PATH, 'data')
+DATA_PATH = "/var/donkeycar"
 MODELS_PATH = os.path.join(CAR_PATH, 'models')
 
 #VEHICLE
@@ -25,7 +25,7 @@ DRIVE_LOOP_HZ = 20
 MAX_LOOPS = 100000
 
 #CAMERA
-CAMERA_RESOLUTION = (240, 320) #(height, width)
+CAMERA_RESOLUTION = (120, 160) #(height, width)
 #CAMERA_RESOLUTION = (120, 160) #(height, width)
 CAMERA_FRAMERATE = DRIVE_LOOP_HZ
 

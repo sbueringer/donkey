@@ -1,5 +1,21 @@
 
-DONKEY_HOME=~/code/github.com/sbueringer/donkeycar
+#
+# donkey_local_dl_data
+# #move tubs to data folder around
+# mv ${GITHUB_HOME}/donkeycar/d2/data/donkeycar/* ${GITHUB_HOME}/donkeycar/d2/data/
+# donkey_local_train_categorical
+# #move tubs to archive
+# mv ${GITHUB_HOME}/donkeycar/d2/data/* ${GITHUB_HOME}/donkeycar/d2/archive/
+# cp ${GITHUB_HOME}/donkeycar/d2/models/donkeybeer ${GITHUB_HOME}/donkeycar/d2/models/donkeybeer.2
+# donkey_local_ul_model
+#
+
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
+
+export TF_CPP_MIN_LOG_LEVEL=2
+
+DONKEY_HOME=~/code/gopath/src/github.com/sbueringer/donkeycar
 DONKEY=/home/pi/.virtualenvs/dk/bin/donkey
 SSH_CMD="sshpass -p 'asdfasdf' ssh pi@donkeybeer"
 SSHPASS_CMD="sshpass -p 'asdfasdf'"
@@ -20,7 +36,8 @@ alias donkeydriveairc="python /home/pi/d2/manage.py drive --model ~/d2/models/do
 alias donkey_local_activateenv='source $DONKEY_HOME/env/bin/activate'
 donkey_local_recompile()
 {
-  source $DONKEY_HOME/env/bin/activate; pip3.6 install -e $DONKEY_HOME; pip3.6 install pyserial
+  #source $DONKEY_HOME/env/bin/activate;
+  pip3.6 install -e $DONKEY_HOME; pip3.6 install pyserial
   cp $DONKEY_HOME/donkeycar/templates/donkey2.py $DONKEY_HOME/d2/manage.py
   cp $DONKEY_HOME/donkeycar/templates/config_defaults.py $DONKEY_HOME/d2/config.py
   mkdir -p $DONKEY_HOME/d2/{models,data,logs}
@@ -37,11 +54,12 @@ donkey_local_convert_tub()
     done
     cp $source/*.json $target/
 }
-alias donkey_local_train="python3.6 $DONKEY_HOME/d2/manage.py train --tub $DONKEY_HOME'/d2/data_resnet50/*' --model $DONKEY_HOME/d2/models/donkeybeer --resnet50 --tensorboardlog $DONKEY_HOME/d2/logs"
-alias donkey_local_train_categorical="python3.6 $DONKEY_HOME/d2/manage.py train --tub $DONKEY_HOME'/d2/data/*' --model $DONKEY_HOME/d2/models/donkeybeer --tensorboardlog $DONKEY_HOME/d2/logs"
+alias donkey_local_train_categorical="python $DONKEY_HOME/d2/manage.py train --tub $DONKEY_HOME/d2/data/* --model $DONKEY_HOME/d2/models/donkeybeer --tensorboardlog $DONKEY_HOME/d2/logs"
+alias donkey_local_train_resnet="python $DONKEY_HOME/d2/manage.py train --tub $DONKEY_HOME'/d2/data_resnet50/*' --model $DONKEY_HOME/d2/models/donkeybeer --resnet50 --tensorboardlog $DONKEY_HOME/d2/logs"
 alias donkey_local_sim="$DONKEY_HOME/DonkeySimLinux/donkey_sim.x86_64"
 alias donkey_local_tensorboard="tensorboard --logdir $DONKEY_HOME/d2/logs"
 
 # Local <=> Donkeycar download data & upload model
-alias donkey_local_dl_data="mkdir -p $DONKEY_HOME/d2; $SSHPASS_CMD scp -rp pi@donkeybeer:~/d2/data $DONKEY_HOME/d2/"
+alias donkey_local_dl_data="mkdir -p $DONKEY_HOME/d2; $SSHPASS_CMD scp -rp pi@donkeybeer:/var/donkeycar $DONKEY_HOME/d2/download"
 alias donkey_local_ul_model="$SSHPASS_CMD scp -rp $DONKEY_HOME/d2/models/ pi@donkeybeer:~/d2/"
+alias donkey_local_ul_model_bak="$SSHPASS_CMD scp -rp $DONKEY_HOME/d2/models.bak/ pi@donkeybeer:~/d2/"
